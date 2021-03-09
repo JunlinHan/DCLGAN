@@ -6,7 +6,6 @@ We provide our PyTorch implementation of unpaired image-to-image translation bas
 
 DCLGAN is a general model pefroming all kinds of Image-to-Image translation tasks. It achieves SOTA performances in most tasks.
 
-
 Our pipeline is quite straight forawrd. The main idea is dual setting with two encoders to capture the variability in two distinctive domains.
 <img src='imgs/dclgan.png' align="right" width=960>
 
@@ -28,7 +27,9 @@ More visual results:
 
 
 ## Prerequisites
-see requirements.txt
+Python 3.6 or above.
+
+For packages, see requirements.txt.
 
 ### Getting started
 
@@ -87,13 +88,15 @@ CityScapes: https://drive.google.com/file/d/1ZiLAhYG647ipaVXyZdBCsGeiHgBmME6X/vi
 
 Download the pre-tained models, unzip it and put it inside ./checkpoints. Then download the dataset of Horse2Zebra and you may evuluate the results using:
 
+```bash
 python test.py --dataroot ./datasets/horse2zebra --name horse2zebra
+```
 
 ### [Datasets](./docs/datasets.md)
 Download CUT/CycleGAN/pix2pix datasets and learn how to create your own datasets.
 
 ### Citation
-If you use our code , please cite our paper.
+If you use our code or our results, please cite our paper. Thanks in advance!
 
 If you use something included in CUT, please cite [CUT](https://arxiv.org/pdf/2007.15651).
 ```
