@@ -7,7 +7,7 @@ We provide our PyTorch implementation of unpaired image-to-image translation bas
 DCLGAN is a general model pefroming all kinds of Image-to-Image translation tasks. It achieves SOTA performances in most tasks.
 
 Our pipeline is quite straight forawrd. The main idea is dual setting with two encoders to capture the variability in two distinctive domains.
-<img src='imgs/dclgan.png' align="right" width=800px>
+<img src='imgs/dclgan.png' align="right" width=800>
 
 ## Example Results
 
