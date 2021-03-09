@@ -86,10 +86,17 @@ Horse <-> Zebra: https://drive.google.com/file/d/16oPsXaP3RgGargJS0JO1K-vWBz42n5
 
 CityScapes: https://drive.google.com/file/d/1ZiLAhYG647ipaVXyZdBCsGeiHgBmME6X/view?usp=sharing
 
-Download the pre-tained models, unzip it and put it inside ./checkpoints. Then download the dataset of Horse2Zebra and you may evuluate the results using:
+Download the pre-tained model, unzip it and put it inside ./checkpoints (You may need to create checkpoints folder by yourself if you didn't run the training code). Example usage: Download the dataset of Horse2Zebra and evuluate the model using:
 
 ```bash
-python test.py --dataroot ./datasets/horse2zebra --name horse2zebra
+python test.py --dataroot ./datasets/horse2zebra --name horse2zebra_dcl
+
+Test the results for Horse-> Zebra using:
+python -m pytorch_fid ./results/horse2zebra_dcl/test_latest/images/fake_B ./results/horse2zebra_dcl/test_latest/images/real_B
+
+and Zorse-> Hebra:
+python -m pytorch_fid ./results/horse2zebra_dcl/test_latest/images/fake_A ./results/horse2zebra_dcl/test_latest/images/real_A
+
 ```
 
 ### [Datasets](./docs/datasets.md)
