@@ -14,12 +14,15 @@ Our pipeline is quite straight forawrd. The main idea is dual setting with two e
 
 ### Unpaired Image-to-Image Translation
 Qualitative results:
+
 <img src="imgs/results.png" width="800px"/>
 
 Quantitative results:
+
 <img src="imgs/results2.png" width="800px"/>
 
 More visual results:
+
 <img src="imgs/results3.png" width="800px"/>
 
 
@@ -54,9 +57,10 @@ The dataset is downloaded and unzipped at `./datasets/grumpifycat/`.
 - Train the DCL model:
 ```bash
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_DCL 
-Or train the SIMDCL model
- ```bash
-python train.py --dataroot ./datasets/grumpifycat --name grumpycat_SIMDCL --model simdcl
+
+Or train the SimDCL model
+
+python train.py --dataroot ./datasets/grumpifycat --name grumpycat_SimDCL --model simdcl
 ```
 The checkpoints will be stored at `./checkpoints/grumpycat_*/web`.
 
@@ -68,17 +72,18 @@ python test.py --dataroot ./datasets/grumpifycat --name grumpycat_DCL
 The test results will be saved to a html file here: `./results/grumpifycat/latest_test/index.html`.
 
 ### DCLGAN, SimDCL, CUT and CycleGAN
-DCLGAN is a more robust unsupervised image-to-image translation model compared to previous models. Our performance is usually better than CUT&CycleGAN.
+DCLGAN is a more robust unsupervised image-to-image translation model compared to previous models. Our performance is usually better than CUT & CycleGAN.
+
 SIMDCL is a different version, it was designed to solve mode collpase. We recommend using it for small-scale, unbalanced dataset.
 
 ### Apply a pre-trained DCL model and evaluate
 We provide our pre-trained DCL models for:
 
-Cat <-> Dog :
+Cat <-> Dog : https://drive.google.com/file/d/1-0SICLeoySDG0q2k1yeJEI2QJvEL-DRG/view?usp=sharing
 
-Horse <-> Zebra:
+Horse <-> Zebra: https://drive.google.com/file/d/16oPsXaP3RgGargJS0JO1K-vWBz42n5lf/view?usp=sharing
 
-CityScapes:
+CityScapes: https://drive.google.com/file/d/1ZiLAhYG647ipaVXyZdBCsGeiHgBmME6X/view?usp=sharing
 
 Download the pre-tained models, unzip it and put it inside ./checkpoints. Then download the dataset of Horse2Zebra and you may evuluate the results using:
 
