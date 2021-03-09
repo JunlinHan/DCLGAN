@@ -2,7 +2,7 @@
 
 # Dual Contrastive Learning Adversarial Generative Networks(DCLGAN)
 
-We provide our PyTorch implementation of unpaired image-to-image translation based on patchwise contrastive learning and dual adversarial learning. DCLGAN (Dual Contrastive Learning Generative Adversarial Networks) is simple yet powerful. Compared to [CycleGAN](https://github.com/junyanz/CycleGAN), DCLGAN performs geometry changes with more realistic results. Compared to [CUT](http://taesung.me/ContrastiveUnpairedTranslation/), DCLGAN is usually more robust and usually achieves better performance. Our model, SimDCL (Similarity DCLGAN) also avoids mode collapse using a new similarity loss. 
+We provide our PyTorch implementation of DCLGN, which is a simple yet powerful model for unsupervised Image-to-image translation. Compared to [CycleGAN](https://github.com/junyanz/CycleGAN), DCLGAN performs geometry changes with more realistic results. Compared to [CUT](http://taesung.me/ContrastiveUnpairedTranslation/), DCLGAN is usually more robust and usually achieves better performance. Our model, SimDCL (Similarity DCLGAN) also avoids mode collapse using a new similarity loss. 
 
 DCLGAN is a general model pefroming all kinds of Image-to-Image translation tasks. It achieves SOTA performances in most tasks.
 
