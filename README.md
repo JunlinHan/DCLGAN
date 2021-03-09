@@ -6,20 +6,21 @@ We provide our PyTorch implementation of unpaired image-to-image translation bas
 
 DCLGAN is a general model pefroming all kinds of Image-to-Image translation tasks. It achieves SOTA performances in most tasks.
 
-<img src='imgs/dclgan.png' align="right" width=960>
+
 Our pipeline is quite straight forawrd. The main idea is dual setting with two encoders to capture the variability in two distinctive domains.
+<img src='imgs/dclgan.png' align="right" width=960>
 
 ## Example Results
 
 ### Unpaired Image-to-Image Translation
 Qualitative results:
-<img src="imgs/results.pdf" width="800px"/>
+<img src="imgs/results.png" width="800px"/>
 
 Quantitative results:
-<img src="imgs/results2.pdf" width="800px"/>
+<img src="imgs/results2.png" width="800px"/>
 
 More visual results:
-<img src="imgs/results3.pdf" width="800px"/>
+<img src="imgs/results3.png" width="800px"/>
 
 
 
@@ -40,7 +41,7 @@ git clone
   For Conda users,  you can create a new Conda environment using `conda env create -f environment.yml`.
 
 
-### DCLGAN and SIMDCL Training and Test
+### DCLGAN and SimDCL Training and Test
 
 - Download the `grumpifycat` dataset (Fig 8 of the paper. Russian Blue -> Grumpy Cats)
 ```bash
@@ -66,7 +67,7 @@ python test.py --dataroot ./datasets/grumpifycat --name grumpycat_DCL
 
 The test results will be saved to a html file here: `./results/grumpifycat/latest_test/index.html`.
 
-### DCLGAN, SIMDCL, CUT and CycleGAN
+### DCLGAN, SimDCL, CUT and CycleGAN
 DCLGAN is a more robust unsupervised image-to-image translation model compared to previous models. Our performance is usually better than CUT&CycleGAN.
 SIMDCL is a different version, it was designed to solve mode collpase. We recommend using it for small-scale, unbalanced dataset.
 
@@ -74,8 +75,14 @@ SIMDCL is a different version, it was designed to solve mode collpase. We recomm
 We provide our pre-trained DCL models for:
 
 Cat <-> Dog :
+
 Horse <-> Zebra:
+
 CityScapes:
+
+Download the pre-tained models, unzip it and put it inside ./checkpoints. Then download the dataset of Horse2Zebra and you may evuluate the results using:
+
+python test.py --dataroot ./datasets/horse2zebra --name horse2zebra
 
 ### [Datasets](./docs/datasets.md)
 Download CUT/CycleGAN/pix2pix datasets and learn how to create your own datasets.
