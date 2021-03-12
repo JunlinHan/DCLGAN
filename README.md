@@ -58,9 +58,11 @@ The dataset is downloaded and unzipped at `./datasets/grumpifycat/`.
 - Train the DCL model:
 ```bash
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_DCL 
+```
 
-Or train the SimDCL model
+Or train the SimDCL model:
 
+```bash
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_SimDCL --model simdcl
 ```
 The checkpoints will be stored at `./checkpoints/grumpycat_*/web`.
@@ -112,7 +114,14 @@ Or download it here: https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/dat
 
 ### Citation
 If you use our code or our results, please cite our paper. Thanks in advance!
-
+```
+@inproceedings{park2020cut,
+  title={Contrastive Learning for Unpaired Image-to-Image Translation},
+  author={Taesung Park and Alexei A. Efros and Richard Zhang and Jun-Yan Zhu},
+  booktitle={European Conference on Computer Vision},
+  year={2020}
+}
+```
 If you use something included in CUT, please cite [CUT](https://arxiv.org/pdf/2007.15651).
 ```
 @inproceedings{park2020cut,
