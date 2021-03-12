@@ -91,7 +91,7 @@ Download the pre-tained model, unzip it and put it inside ./checkpoints (You may
 ```bash
 python test.py --dataroot ./datasets/horse2zebra --name horse2zebra_dcl
 
-Test the results for Horse-> Zebra using:
+Test the results for Horse-> Zebra ( with [pytorch-fid](https://github.com/mseitzer/pytorch-fid)):
 python -m pytorch_fid ./results/horse2zebra_dcl/test_latest/images/fake_B ./results/horse2zebra_dcl/test_latest/images/real_B
 
 and Zorse-> Hebra:
@@ -133,6 +133,8 @@ If you use the original [pix2pix](https://phillipi.github.io/pix2pix/) and [Cycl
 }
 ```
 
+### Contact
+junlin.han@data61.csiro.au or junlinhcv@gmail.com
 
 ### Acknowledgments
 Our code is developed based on [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) and [CUT](http://taesung.me/ContrastiveUnpairedTranslation/). We thank the awesome work provided by CycleGAN and CUT.
