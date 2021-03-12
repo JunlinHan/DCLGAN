@@ -101,6 +101,7 @@ python -m pytorch_fid ./results/horse2zebra_dcl/test_latest/images/fake_A ./resu
 
 ### [Datasets](./docs/datasets.md)
 Download CUT/CycleGAN/pix2pix datasets and learn how to create your own datasets.
+Or download it here: https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/datasets/.
 
 ### Citation
 If you use our code or our results, please cite our paper. Thanks in advance!
