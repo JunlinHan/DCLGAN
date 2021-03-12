@@ -95,11 +95,14 @@ python test.py --dataroot ./datasets/horse2zebra --name horse2zebra_dcl
 For FID score, use [pytorch-fid](https://github.com/mseitzer/pytorch-fid).
 
 Test the FID for Horse-> Zebra:
+```bash
 python -m pytorch_fid ./results/horse2zebra_dcl/test_latest/images/fake_B ./results/horse2zebra_dcl/test_latest/images/real_B
+```
 
 and Zorse-> Hebra:
+```bash
 python -m pytorch_fid ./results/horse2zebra_dcl/test_latest/images/fake_A ./results/horse2zebra_dcl/test_latest/images/real_A
-
+```
 
 
 ### [Datasets](./docs/datasets.md)
