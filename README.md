@@ -65,7 +65,7 @@ Or train the SimDCL model:
 ```bash
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_SimDCL --model simdcl
 ```
-The checkpoints will be stored at `./checkpoints/grumpycat_*/web`.
+The checkpoints will be stored at `./checkpoints/grumpycat_DCL*/web`.
 
 - Test the DCL model:
 ```bash
