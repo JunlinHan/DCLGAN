@@ -65,6 +65,19 @@ Or train the SimDCL model:
 ```bash
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_SimDCL --model simdcl
 ```
+
+We also support CUT:
+
+```bash
+python train.py --dataroot ./datasets/grumpifycat --name grumpycat_cut --model cut
+```
+
+and fastCUT:
+
+```bash
+python train.py --dataroot ./datasets/grumpifycat --name grumpycat_fastcut --model fastcut
+```
+
 The checkpoints will be stored at `./checkpoints/grumpycat_DCL*/web`.
 
 - Test the DCL model:
