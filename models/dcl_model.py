@@ -215,9 +215,7 @@ class DCLModel(BaseModel):
         else:
             self.loss_NCE1, self.loss_NCE_bd ,self.loss_NCE2 = 0.0, 0.0 ,0.0
         if self.opt.lambda_NCE > 0.0:
-            # NCE IDENTICAL Loss
-            #self.loss_NCE_Y1 = self.calculate_NCE_loss3(self.real_B, self.idt_A)
-            #self.loss_NCE_Y2 = self.calculate_NCE_loss4(self.real_A, self.idt_B)
+
             # L1 IDENTICAL Loss
             self.loss_idt_A = self.criterionIdt(self.idt_A, self.real_B) * self.opt.lambda_IDT
             self.loss_idt_B = self.criterionIdt(self.idt_B, self.real_A) * self.opt.lambda_IDT
@@ -247,30 +245,6 @@ class DCLModel(BaseModel):
         feat_q = self.netG_A(tgt, self.nce_layers, encode_only=True)
         feat_k = self.netG_B(src, self.nce_layers, encode_only=True)
         feat_k_pool, sample_ids = self.netF2(feat_k, self.opt.num_patches, None)
-        feat_q_pool, _ = self.netF1(feat_q, self.opt.num_patches, sample_ids)
-        total_nce_loss = 0.0
-        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
-            loss = crit(f_q, f_k)
-            total_nce_loss += loss.mean()
-        return total_nce_loss / n_layers
-
-    def calculate_NCE_loss3(self, src, tgt):
-        n_layers = len(self.nce_layers)
-        feat_q = self.netG_B(tgt, self.nce_layers, encode_only=True)
-        feat_k = self.netG_B(src, self.nce_layers, encode_only=True)
-        feat_k_pool, sample_ids = self.netF2(feat_k, self.opt.num_patches, None)
-        feat_q_pool, _ = self.netF2(feat_q, self.opt.num_patches, sample_ids)
-        total_nce_loss = 0.0
-        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
-            loss = crit(f_q, f_k)
-            total_nce_loss += loss.mean()
-        return total_nce_loss / n_layers
-
-    def calculate_NCE_loss4(self, src, tgt):
-        n_layers = len(self.nce_layers)
-        feat_q = self.netG_A(tgt, self.nce_layers, encode_only=True)
-        feat_k = self.netG_A(src, self.nce_layers, encode_only=True)
-        feat_k_pool, sample_ids = self.netF1(feat_k, self.opt.num_patches, None)
         feat_q_pool, _ = self.netF1(feat_q, self.opt.num_patches, sample_ids)
         total_nce_loss = 0.0
         for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):

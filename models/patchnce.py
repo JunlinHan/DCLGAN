@@ -2,8 +2,9 @@ from packaging import version
 import torch
 from torch import nn
 
-# Note this is different from the original CUT. We use cosine similarity here, but both implementations are identical.
-# You may replace this using the pathnece.py from CUT to support training with larger batchsize.
+# Note this is different from the original CUT. We use cosine similarity here, but both implementations are identical ( after the L2 normalization).
+# You may replace this using the pathnece.py from CUT if you change the default setting.
+# But we recommend using this implementation, it usually gives slightly better performance.
 class PatchNCELoss(nn.Module):
     def __init__(self, opt):
         super().__init__()
