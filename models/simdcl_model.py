@@ -1,4 +1,4 @@
-﻿import itertools
+import itertools
 import torch
 from .base_model import BaseModel
 from . import networks
@@ -81,10 +81,11 @@ class SIMDCLModel(BaseModel):
                                        not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
         self.netF2 = networks.define_F(opt.input_nc, opt.netF, opt.normG,
                                        not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
-        self.netF3 = networks.define_F(4, 'mapping')
-        self.netF4 = networks.define_F(4, 'mapping')
-        self.netF5 = networks.define_F(4, 'mapping')
-        self.netF6 = networks.define_F(4, 'mapping')
+        n_layers = len(self.nce_layers)
+        self.netF3 = networks.define_F(n_layers, 'mapping')
+        self.netF4 = networks.define_F(n_layers, 'mapping')
+        self.netF5 = networks.define_F(n_layers, 'mapping')
+        self.netF6 = networks.define_F(n_layers, 'mapping')
         if self.isTrain:
             self.netD_A = networks.define_D(opt.output_nc, opt.ndf, opt.netD,
                                           opt.n_layers_D, opt.normD, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
@@ -214,78 +215,58 @@ class SIMDCLModel(BaseModel):
         else:
             self.loss_G_A = 0.0
             self.loss_G_B = 0.0
-
-        if self.opt.lambda_NCE > 0.0:
-            self.loss_NCE1 = self.calculate_NCE_loss1(self.real_A, self.fake_B) * self.opt.lambda_NCE
-            self.loss_NCE2 = self.calculate_NCE_loss2(self.real_B, self.fake_A) * self.opt.lambda_NCE
-        else:
-            self.loss_NCE1, self.loss_NCE_bd ,self.loss_NCE2 = 0.0, 0.0 ,0.0
-        if self.opt.nce_idt and self.opt.lambda_NCE > 0.0:
-            # L1 IDENTICAL LOSS
-            self.loss_idt_A = self.criterionIdt(self.idt_A, self.real_B)
-            self.loss_idt_B = self.criterionIdt(self.idt_B, self.real_A)
-            # Similarity Loss
-            self.loss_Sim = self.calculate_Sim_loss(self.real_A, self.fake_B, self.real_B, self.fake_A) * self.opt.lambda_SIM
-
-            loss_NCE_both = (self.loss_NCE1 + self.loss_NCE2) * 0.5 + (self.loss_idt_A + self.loss_idt_B) * 0.5 + self.loss_Sim
-        else:
-            loss_NCE_both = (self.loss_NCE1+ self.loss_NCE2) * 0.5 + self.loss_Sim
-
-
-
+        # L1 IDENTICAL LOSS
+        self.loss_idt_A = self.criterionIdt(self.idt_A, self.real_B)
+        self.loss_idt_B = self.criterionIdt(self.idt_B, self.real_A)
+        # Similarity Loss and NCE losses
+        self.loss_Sim, self.loss_NCE1, self.loss_NCE2 = self.calculate_Sim_loss_all(self.real_A, self.fake_B, self.real_B, self.fake_A)
+        loss_NCE_both = (self.loss_NCE1 + self.loss_NCE2) * 0.5 + (self.loss_idt_A + self.loss_idt_B) * 0.5 + self.loss_Sim
         self.loss_G = (self.loss_G_A +self.loss_G_B) * 0.5 + loss_NCE_both
         return self.loss_G
 
-    def calculate_Sim_loss(self, src1, tgt1 ,src2, tgt2):
+    def calculate_Sim_loss_all(self, src1, tgt1, src2, tgt2):
         n_layers = len(self.nce_layers)
         feat_q1 = self.netG_B(tgt1, self.nce_layers, encode_only=True)
         feat_k1 = self.netG_A(src1, self.nce_layers, encode_only=True)
         feat_q2 = self.netG_A(tgt2, self.nce_layers, encode_only=True)
         feat_k2 = self.netG_B(src2, self.nce_layers, encode_only=True)
         feat_k_pool1, sample_ids1 = self.netF1(feat_k1, self.opt.num_patches, None)
-        feat_q_pool1, _ = self.netF2(feat_q1, self.opt.num_patches, None)
+        feat_q_pool1, _ = self.netF2(feat_q1, self.opt.num_patches, sample_ids1)
+        feat_q_pool1_noid, _ = self.netF2(feat_q1, self.opt.num_patches, None)
         feat_k_pool2, sample_ids2 = self.netF2(feat_k2, self.opt.num_patches, None)
-        feat_q_pool2, _ = self.netF1(feat_q2, self.opt.num_patches, None)
-        my_layers = len(self.nce_layers)
-        tensor1 = torch.zeros([n_layers, 256, 256])
-        tensor2 = torch.zeros([n_layers, 256, 256])
-        tensor3 = torch.zeros([n_layers, 256, 256])
-        tensor4 = torch.zeros([n_layers, 256, 256])
-        for i in range(my_layers):
-            tensor1[i] = feat_k_pool1[i]
-            tensor2[i] = feat_q_pool1[i]
-            tensor3[i] = feat_k_pool2[i]
-            tensor4[i] = feat_q_pool2[i]
-        tensor11 = self.netF3(tensor1)
-        tensor22 = self.netF4(tensor2)
-        tensor33 = self.netF5(tensor3)
-        tensor44 = self.netF6(tensor4)
-        total_loss = self.criterionSim(tensor11,tensor44) + self.criterionSim(tensor22,tensor33)
-        return total_loss
+        feat_q_pool2, _ = self.netF1(feat_q2, self.opt.num_patches, sample_ids2)
+        feat_q_pool2_noid, _ = self.netF1(feat_q2, self.opt.num_patches, None)
 
-    def calculate_NCE_loss1(self, src, tgt):
-        n_layers = len(self.nce_layers)
-        feat_q = self.netG_B(tgt, self.nce_layers, encode_only=True)
-        feat_k = self.netG_A(src, self.nce_layers, encode_only=True)
-        feat_k_pool, sample_ids = self.netF1(feat_k, self.opt.num_patches, None)
-        feat_q_pool, _ = self.netF2(feat_q, self.opt.num_patches, sample_ids)
-        total_nce_loss = 0.0
-        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
+        nce_loss1 = 0.0
+        for f_q, f_k, crit in zip(feat_q_pool1, feat_k_pool1, self.criterionNCE):
             loss = crit(f_q, f_k)
-            total_nce_loss += loss.mean()
-        return total_nce_loss / n_layers
+            nce_loss1 += loss.mean()
 
-    def calculate_NCE_loss2(self, src, tgt):
-        n_layers = len(self.nce_layers)
-        feat_q = self.netG_A(tgt, self.nce_layers, encode_only=True)
-        feat_k = self.netG_B(src, self.nce_layers, encode_only=True)
-        feat_k_pool, sample_ids = self.netF2(feat_k, self.opt.num_patches, None)
-        feat_q_pool, _ = self.netF1(feat_q, self.opt.num_patches, sample_ids)
-        total_nce_loss = 0.0
-        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
+        nce_loss2 = 0.0
+        for f_q, f_k, crit in zip(feat_q_pool2, feat_k_pool2, self.criterionNCE):
             loss = crit(f_q, f_k)
-            total_nce_loss += loss.mean()
-        return total_nce_loss / n_layers
+            nce_loss2 += loss.mean()
+
+        nce_loss1 = nce_loss1/n_layers
+        nce_loss2 = nce_loss2/n_layers
+
+        feature_realA = torch.zeros([n_layers, 256, 256])
+        feature_fakeB = torch.zeros([n_layers, 256, 256])
+        feature_realB = torch.zeros([n_layers, 256, 256])
+        feature_fakeA = torch.zeros([n_layers, 256, 256])
+        for i in range(n_layers):
+            feature_realA[i] = feat_k_pool1[i]
+            feature_fakeB[i] = feat_q_pool1_noid[i]
+            feature_realB[i] = feat_k_pool2[i]
+            feature_fakeA[i] = feat_q_pool2_noid[i]
+
+        feature_realA_out = self.netF3(feature_realA)
+        feature_fakeB_out = self.netF4(feature_fakeB)
+        feature_realB_out = self.netF5(feature_realB)
+        feature_fakeA_out = self.netF6(feature_fakeA)
+        sim_loss = self.criterionSim(feature_realA_out,feature_fakeA_out) + self.criterionSim(feature_fakeB_out,feature_realB_out)
+
+        return sim_loss, nce_loss1, nce_loss2
 
     def generate_visuals_for_evaluation(self, data, mode):
         with torch.no_grad():
