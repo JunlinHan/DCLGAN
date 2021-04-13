@@ -1,8 +1,8 @@
-﻿import numpy as np
+import numpy as np
 import torch
 from .base_model import BaseModel
 from . import networks
-from .patchnce import PatchNCELoss
+from .patchnce import PatchNCELoss2
 import util.util as util
 
 
@@ -77,7 +77,7 @@ class CUTModel(BaseModel):
             self.criterionNCE = []
 
             for nce_layer in self.nce_layers:
-                self.criterionNCE.append(PatchNCELoss(opt).to(self.device))
+                self.criterionNCE.append(PatchNCELoss2(opt).to(self.device))
 
             self.criterionIdt = torch.nn.L1Loss().to(self.device)
             self.optimizer_G = torch.optim.Adam(self.netG.parameters(), lr=0.0002, betas=(opt.beta1, opt.beta2))
