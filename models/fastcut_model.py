@@ -6,7 +6,7 @@ from .patchnce import PatchNCELoss2
 import util.util as util
 
 
-class CUTModel(BaseModel):
+class FASTCUTModel(BaseModel):
     """ This class implements CUT and FastCUT model, described in the paper
     Contrastive Learning for Unpaired Image-to-Image Translation
     Taesung Park, Alexei A. Efros, Richard Zhang, Jun-Yan Zhu
@@ -17,7 +17,7 @@ class CUTModel(BaseModel):
     """
     @staticmethod
     def modify_commandline_options(parser, is_train=True):
-        """  Configures options specific for CUT model
+        """  Configures options specific for FASTCUT model
         """
         parser.add_argument('--lambda_GAN', type=float, default=1.0, help='weight for GAN loss：GAN(G(X))')
         parser.add_argument('--lambda_NCE', type=float, default=1.0, help='weight for NCE loss: NCE(G(X), X)')
