@@ -1,4 +1,4 @@
-﻿import torch
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
@@ -274,7 +274,7 @@ def define_F(input_nc, netF, norm='batch', use_dropout=False, init_type='normal'
     elif netF == 'reshape':
         net = ReshapeF()
     elif netF == 'mapping':
-        net = MappingF()
+        net = MappingF(input_nc)
     elif netF == 'sample':
         net = PatchSampleF(use_mlp=False, init_type=init_type, init_gain=init_gain, gpu_ids=gpu_ids, nc=opt.netF_nc)
     elif netF == 'mlp_sample':
@@ -493,31 +493,26 @@ class ReshapeF(nn.Module):
         return self.l2norm(x_reshape)
 
 class MappingF(nn.Module):
-    def __init__(self, nc=1):
-        super(MappingF, self).__init__()
-        self.nc = nc
-        m=nn.LeakyReLU(0.1)
-        n=nn.ReLU()
+    def __init__(self, in_layer=4, nc=256, patch_num=256, dim=64, init_type='normal', init_gain=0.02, gpu_ids=[]):
+        # hard-coded code.
+        super().__init__()
+        self.init_type = init_type
+        self.nc=nc
+        self.dim=dim
+        self.in_layer=in_layer
+        self.patch_num = patch_num
+        self.init_type = init_type
+        self.init_gain = init_gain
+        self.gpu_ids = gpu_ids
         avg = nn.AdaptiveAvgPool2d(1)
-        conv = nn.Conv2d(4,64,3,stride=2)
-        # self.model = nn.Sequential(*[model,m, nn.Linear(128, 100),m, nn.Linear(100, 80),
-        #                              m, nn.Linear(80, 60),m, nn.Linear(60, 40),m,
-        #                              nn.Linear(40, 20),m, nn.Linear(20, 10),m, nn.Linear(10, nc),m, nn.Linear(nc,nc)])
-
-        # self.model2 = nn.Sequential(*[nn.Linear(256,16),n])
-        self.model = nn.Sequential(*[conv,n,avg])
-        self.linear = nn.Sequential(*[nn.Linear(64,64),n,nn.Linear(64,64)])
-        # self.model = nn.Sequential(*[nn.Linear(256,128),n,nn.Linear(128, 100),n, nn.Linear(100, 80),
-        #                              n, nn.Linear(80, 60),n, nn.Linear(60, 40),n,
-        #                              nn.Linear(40, 20),n, nn.Linear(20, 10),n, nn.Linear(10, nc)])#,n, nn.Linear(nc,nc)])
+        conv = nn.Conv2d(in_layer, dim, 3, stride=2)
+        self.model = nn.Sequential(*[conv,nn.ReLU(),avg,nn.Flatten(),nn.Linear(dim,dim),nn.ReLU(),nn.Linear(dim,dim)])
+        init_net(self.model, self.init_type, self.init_gain, self.gpu_ids)
         self.l2norm = Normalize(2)
-        self.l1norm = Normalize(1)
 
     def forward(self, x):
-        x= x.view(1,-1,256,256)
-        x= self.model(x)
-        x= x.view(1,-1)
-        x= self.linear(x)
+        x = x.view(1, -1, self.patch_num, self.nc)
+        x = self.model(x)
         x_norm = self.l2norm(x)
         return x_norm
 
