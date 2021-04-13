@@ -1,6 +1,3 @@
-import itertools
-import torch
-from .base_model import BaseModel
 from . import networks
 from .patchnce import PatchNCELoss
 import util.util as util
@@ -82,10 +79,10 @@ class SIMDCLModel(BaseModel):
         self.netF2 = networks.define_F(opt.input_nc, opt.netF, opt.normG,
                                        not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
         n_layers = len(self.nce_layers)
-        self.netF3 = networks.define_F(n_layers, 'mapping')
-        self.netF4 = networks.define_F(n_layers, 'mapping')
-        self.netF5 = networks.define_F(n_layers, 'mapping')
-        self.netF6 = networks.define_F(n_layers, 'mapping')
+        self.netF3 = networks.define_F(n_layers,'mapping')
+        self.netF4 = networks.define_F(n_layers,'mapping')
+        self.netF5 = networks.define_F(n_layers,'mapping')
+        self.netF6 = networks.define_F(n_layers,'mapping')
         if self.isTrain:
             self.netD_A = networks.define_D(opt.output_nc, opt.ndf, opt.netD,
                                           opt.n_layers_D, opt.normD, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
@@ -247,13 +244,13 @@ class SIMDCLModel(BaseModel):
             loss = crit(f_q, f_k)
             nce_loss2 += loss.mean()
 
+        m,n = self.opt.num_patches, self.opt.netF_nc
         nce_loss1 = nce_loss1/n_layers
         nce_loss2 = nce_loss2/n_layers
-
-        feature_realA = torch.zeros([n_layers, 256, 256])
-        feature_fakeB = torch.zeros([n_layers, 256, 256])
-        feature_realB = torch.zeros([n_layers, 256, 256])
-        feature_fakeA = torch.zeros([n_layers, 256, 256])
+        feature_realA = torch.zeros([n_layers, m, n])
+        feature_fakeB = torch.zeros([n_layers, m, n])
+        feature_realB = torch.zeros([n_layers, m, n])
+        feature_fakeA = torch.zeros([n_layers, m, n])
         for i in range(n_layers):
             feature_realA[i] = feat_k_pool1[i]
             feature_fakeB[i] = feat_q_pool1_noid[i]
@@ -264,9 +261,34 @@ class SIMDCLModel(BaseModel):
         feature_fakeB_out = self.netF4(feature_fakeB)
         feature_realB_out = self.netF5(feature_realB)
         feature_fakeA_out = self.netF6(feature_fakeA)
-        sim_loss = self.criterionSim(feature_realA_out,feature_fakeA_out) + self.criterionSim(feature_fakeB_out,feature_realB_out)
+        sim_loss = self.criterionSim(feature_realA_out,feature_fakeA_out) + \
+                   self.criterionSim(feature_fakeB_out,feature_realB_out)
 
         return sim_loss, nce_loss1, nce_loss2
+
+    def calculate_NCE_loss1(self, src, tgt):
+        n_layers = len(self.nce_layers)
+        feat_q = self.netG_B(tgt, self.nce_layers, encode_only=True)
+        feat_k = self.netG_A(src, self.nce_layers, encode_only=True)
+        feat_k_pool, sample_ids = self.netF1(feat_k, self.opt.num_patches, None)
+        feat_q_pool, _ = self.netF2(feat_q, self.opt.num_patches, sample_ids)
+        total_nce_loss = 0.0
+        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
+            loss = crit(f_q, f_k)
+            total_nce_loss += loss.mean()
+        return total_nce_loss / n_layers
+
+    def calculate_NCE_loss2(self, src, tgt):
+        n_layers = len(self.nce_layers)
+        feat_q = self.netG_A(tgt, self.nce_layers, encode_only=True)
+        feat_k = self.netG_B(src, self.nce_layers, encode_only=True)
+        feat_k_pool, sample_ids = self.netF2(feat_k, self.opt.num_patches, None)
+        feat_q_pool, _ = self.netF1(feat_q, self.opt.num_patches, sample_ids)
+        total_nce_loss = 0.0
+        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
+            loss = crit(f_q, f_k)
+            total_nce_loss += loss.mean()
+        return total_nce_loss / n_layers
 
     def generate_visuals_for_evaluation(self, data, mode):
         with torch.no_grad():
