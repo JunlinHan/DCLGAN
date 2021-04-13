@@ -1,10 +1,8 @@
 from packaging import version
 import torch
 from torch import nn
-
 # Note this is different from the vanilla CUT. I use cosine similarity here, but both implementations are identical ( after the L2 normalization).
 # You may replace this with class PatchNCEloss2 ( used in vanilla CUT, no cosine similarity)
-# I recommend using this implementation, it usually gives slightly better performance ( though I haven't find the reason yet).
 class PatchNCELoss(nn.Module):
     def __init__(self, opt):
         super().__init__()
