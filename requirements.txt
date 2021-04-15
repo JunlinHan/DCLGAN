@@ -4,7 +4,6 @@ dominate>=2.4.0
 visdom>=0.1.8.8
 packaging
 GPUtil>=1.4.0
-python=3.6
 scipy
 Pillow>=6.1.0
 numpy>=1.16.4

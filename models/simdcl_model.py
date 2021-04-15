@@ -1,12 +1,11 @@
+import itertools
+import torch
+from .base_model import BaseModel
 from . import networks
 from .patchnce import PatchNCELoss
 import util.util as util
 from util.image_pool import ImagePool
 
-try:
-    from apex import amp
-except ImportError as error:
-    print(error)
 
 class SIMDCLModel(BaseModel):
     """
@@ -22,12 +21,14 @@ class SIMDCLModel(BaseModel):
         parser.add_argument('--lambda_GAN', type=float, default=1.0, help='weight for GAN loss：GAN(G(X))')
         parser.add_argument('--lambda_NCE', type=float, default=2.0, help='weight for NCE loss: NCE(G(X), X)')
         parser.add_argument('--lambda_SIM', type=float, default=10.0, help='weight for NCE loss: NCE(G(X), X)')
-        parser.add_argument('--nce_idt', type=util.str2bool, nargs='?', const=True, default=False, help='use NCE loss for identity mapping: NCE(G(Y), Y))')
+        parser.add_argument('--nce_idt', type=util.str2bool, nargs='?', const=True, default=False,
+                            help='use NCE loss for identity mapping: NCE(G(Y), Y))')
         parser.add_argument('--nce_layers', type=str, default='4,8,12,16', help='compute NCE loss on which layers')
         parser.add_argument('--nce_includes_all_negatives_from_minibatch',
                             type=util.str2bool, nargs='?', const=True, default=False,
                             help='(used for single image translation) If True, include the negatives from the other samples of the minibatch when computing the contrastive loss. Please see models/patchnce.py for more details.')
-        parser.add_argument('--netF', type=str, default='mlp_sample', choices=['sample', 'reshape', 'mlp_sample'], help='how to downsample the feature map')
+        parser.add_argument('--netF', type=str, default='mlp_sample', choices=['sample', 'reshape', 'mlp_sample'],
+                            help='how to downsample the feature map')
         parser.add_argument('--netF_nc', type=int, default=256)
         parser.add_argument('--nce_T', type=float, default=0.07, help='temperature for NCE loss')
         parser.add_argument('--num_patches', type=int, default=256, help='number of patches per layer')
@@ -52,7 +53,7 @@ class SIMDCLModel(BaseModel):
 
         # specify the training losses you want to print out.
         # The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = ['D_A', 'G_A', 'NCE1', 'D_B', 'G_B', 'NCE2' , 'G' , 'Sim']
+        self.loss_names = ['D_A', 'G_A', 'NCE1', 'D_B', 'G_B', 'NCE2', 'G', 'Sim']
         visual_names_A = ['real_A', 'fake_B']
         visual_names_B = ['real_B', 'fake_A']
         self.nce_layers = [int(i) for i in self.opt.nce_layers.split(',')]
@@ -65,29 +66,35 @@ class SIMDCLModel(BaseModel):
         self.visual_names = visual_names_A + visual_names_B  # combine visualizations for A and B
 
         if self.isTrain:
-            self.model_names = ['G_A', 'F1', 'D_A', 'G_B', 'F2', 'D_B','F3', 'F4','F5','F6']
+            self.model_names = ['G_A', 'F1', 'D_A', 'G_B', 'F2', 'D_B', 'F3', 'F4', 'F5', 'F6']
         else:  # during test time, only load G
             self.model_names = ['G_A', 'G_B']
 
         # define networks (both generator and discriminator)
         self.netG_A = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.normG,
-                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, opt.no_antialias_up, self.gpu_ids, opt)
+                                        not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias,
+                                        opt.no_antialias_up, self.gpu_ids, opt)
         self.netG_B = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.normG,
-                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, opt.no_antialias_up, self.gpu_ids, opt)
+                                        not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias,
+                                        opt.no_antialias_up, self.gpu_ids, opt)
         self.netF1 = networks.define_F(opt.input_nc, opt.netF, opt.normG,
-                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
+                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids,
+                                       opt)
         self.netF2 = networks.define_F(opt.input_nc, opt.netF, opt.normG,
-                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
+                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids,
+                                       opt)
         n_layers = len(self.nce_layers)
-        self.netF3 = networks.define_F(n_layers,'mapping')
-        self.netF4 = networks.define_F(n_layers,'mapping')
-        self.netF5 = networks.define_F(n_layers,'mapping')
-        self.netF6 = networks.define_F(n_layers,'mapping')
+        self.netF3 = networks.define_F(n_layers, 'mapping')
+        self.netF4 = networks.define_F(n_layers, 'mapping')
+        self.netF5 = networks.define_F(n_layers, 'mapping')
+        self.netF6 = networks.define_F(n_layers, 'mapping')
         if self.isTrain:
             self.netD_A = networks.define_D(opt.output_nc, opt.ndf, opt.netD,
-                                          opt.n_layers_D, opt.normD, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
+                                            opt.n_layers_D, opt.normD, opt.init_type, opt.init_gain, opt.no_antialias,
+                                            self.gpu_ids, opt)
             self.netD_B = networks.define_D(opt.output_nc, opt.ndf, opt.netD,
-                                          opt.n_layers_D, opt.normD, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids, opt)
+                                            opt.n_layers_D, opt.normD, opt.init_type, opt.init_gain, opt.no_antialias,
+                                            self.gpu_ids, opt)
             self.fake_A_pool = ImagePool(opt.pool_size)  # create image buffer to store previously generated images
             self.fake_B_pool = ImagePool(opt.pool_size)  # create image buffer to store previously generated images
             # define loss functions
@@ -99,11 +106,12 @@ class SIMDCLModel(BaseModel):
 
             self.criterionIdt = torch.nn.L1Loss().to(self.device)
             self.criterionSim = torch.nn.L1Loss('sum').to(self.device)
-            self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()), lr=self.opt.lr, betas=(opt.beta1, opt.beta2))
-            self.optimizer_D = torch.optim.Adam(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()), lr=self.opt.lr, betas=(opt.beta1, opt.beta2))
+            self.optimizer_G = torch.optim.Adam(itertools.chain(self.netG_A.parameters(), self.netG_B.parameters()),
+                                                lr=self.opt.lr, betas=(opt.beta1, opt.beta2))
+            self.optimizer_D = torch.optim.Adam(itertools.chain(self.netD_A.parameters(), self.netD_B.parameters()),
+                                                lr=self.opt.lr, betas=(opt.beta1, opt.beta2))
             self.optimizers.append(self.optimizer_G)
             self.optimizers.append(self.optimizer_D)
-
 
     def data_dependent_initialize(self, data):
         """
@@ -116,14 +124,17 @@ class SIMDCLModel(BaseModel):
         bs_per_gpu = self.real_A.size(0) // max(len(self.opt.gpu_ids), 1)
         self.real_A = self.real_A[:bs_per_gpu]
         self.real_B = self.real_B[:bs_per_gpu]
-        self.forward()                     # compute fake images: G(A)
+        self.forward()  # compute fake images: G(A)
         if self.opt.isTrain:
-            self.compute_G_loss().backward()                   # calculate graidents for G
+            self.compute_G_loss().backward()  # calculate graidents for G
             self.backward_D_A()  # calculate gradients for D_A
             self.backward_D_B()  # calculate graidents for D_B
             if self.opt.lambda_NCE > 0.0:
-                self.optimizer_F = torch.optim.Adam(itertools.chain(self.netF1.parameters(), self.netF2.parameters(),self.netF3.parameters(), self.netF4.parameters(),
-                                                                    self.netF5.parameters(), self.netF6.parameters()), lr=self.opt.lr, betas=(self.opt.beta1, self.opt.beta2))
+                self.optimizer_F = torch.optim.Adam(
+                    itertools.chain(self.netF1.parameters(), self.netF2.parameters(), self.netF3.parameters(),
+                                    self.netF4.parameters(),
+                                    self.netF5.parameters(), self.netF6.parameters()), lr=self.opt.lr,
+                    betas=(self.opt.beta1, self.opt.beta2))
                 self.optimizers.append(self.optimizer_F)
 
     def optimize_parameters(self):
@@ -133,8 +144,8 @@ class SIMDCLModel(BaseModel):
         # update D
         self.set_requires_grad([self.netD_A, self.netD_B], True)
         self.optimizer_D.zero_grad()
-        self.backward_D_A()      # calculate gradients for D_A
-        self.backward_D_B()      # calculate graidents for D_B
+        self.backward_D_A()  # calculate gradients for D_A
+        self.backward_D_B()  # calculate graidents for D_B
         self.optimizer_D.step()
         # update G
         self.set_requires_grad([self.netD_A, self.netD_B], False)
@@ -146,6 +157,7 @@ class SIMDCLModel(BaseModel):
         self.optimizer_G.step()
         if self.opt.netF == 'mlp_sample':
             self.optimizer_F.step()
+
     def set_input(self, input):
         """Unpack input data from the dataloader and perform necessary pre-processing steps.
         Parameters:
@@ -197,7 +209,6 @@ class SIMDCLModel(BaseModel):
         fake_A = self.fake_A_pool.query(self.fake_A)
         self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, fake_A)
 
-
     def compute_G_loss(self):
         """Calculate GAN and NCE loss for the generator"""
         fakeB = self.fake_B
@@ -216,9 +227,11 @@ class SIMDCLModel(BaseModel):
         self.loss_idt_A = self.criterionIdt(self.idt_A, self.real_B)
         self.loss_idt_B = self.criterionIdt(self.idt_B, self.real_A)
         # Similarity Loss and NCE losses
-        self.loss_Sim, self.loss_NCE1, self.loss_NCE2 = self.calculate_Sim_loss_all(self.real_A, self.fake_B, self.real_B, self.fake_A)
-        loss_NCE_both = (self.loss_NCE1 + self.loss_NCE2) * 0.5 + (self.loss_idt_A + self.loss_idt_B) * 0.5 + self.loss_Sim
-        self.loss_G = (self.loss_G_A +self.loss_G_B) * 0.5 + loss_NCE_both
+        self.loss_Sim, self.loss_NCE1, self.loss_NCE2 = self.calculate_Sim_loss_all \
+            (self.real_A, self.fake_B, self.real_B, self.fake_A)
+        loss_NCE_both = (self.loss_NCE1 + self.loss_NCE2) * 0.5 + (self.loss_idt_A + self.loss_idt_B) * 0.5 \
+                        + self.loss_Sim
+        self.loss_G = (self.loss_G_A + self.loss_G_B) * 0.5 + loss_NCE_both
         return self.loss_G
 
     def calculate_Sim_loss_all(self, src1, tgt1, src2, tgt2):
@@ -244,9 +257,9 @@ class SIMDCLModel(BaseModel):
             loss = crit(f_q, f_k)
             nce_loss2 += loss.mean()
 
-        m,n = self.opt.num_patches, self.opt.netF_nc
-        nce_loss1 = nce_loss1/n_layers
-        nce_loss2 = nce_loss2/n_layers
+        m, n = self.opt.num_patches, self.opt.netF_nc
+        nce_loss1 = nce_loss1 / n_layers
+        nce_loss2 = nce_loss2 / n_layers
         feature_realA = torch.zeros([n_layers, m, n])
         feature_fakeB = torch.zeros([n_layers, m, n])
         feature_realB = torch.zeros([n_layers, m, n])
@@ -261,34 +274,10 @@ class SIMDCLModel(BaseModel):
         feature_fakeB_out = self.netF4(feature_fakeB)
         feature_realB_out = self.netF5(feature_realB)
         feature_fakeA_out = self.netF6(feature_fakeA)
-        sim_loss = self.criterionSim(feature_realA_out,feature_fakeA_out) + \
-                   self.criterionSim(feature_fakeB_out,feature_realB_out)
+        sim_loss = self.criterionSim(feature_realA_out, feature_fakeA_out) + \
+                   self.criterionSim(feature_fakeB_out, feature_realB_out)
 
         return sim_loss, nce_loss1, nce_loss2
-
-    def calculate_NCE_loss1(self, src, tgt):
-        n_layers = len(self.nce_layers)
-        feat_q = self.netG_B(tgt, self.nce_layers, encode_only=True)
-        feat_k = self.netG_A(src, self.nce_layers, encode_only=True)
-        feat_k_pool, sample_ids = self.netF1(feat_k, self.opt.num_patches, None)
-        feat_q_pool, _ = self.netF2(feat_q, self.opt.num_patches, sample_ids)
-        total_nce_loss = 0.0
-        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
-            loss = crit(f_q, f_k)
-            total_nce_loss += loss.mean()
-        return total_nce_loss / n_layers
-
-    def calculate_NCE_loss2(self, src, tgt):
-        n_layers = len(self.nce_layers)
-        feat_q = self.netG_A(tgt, self.nce_layers, encode_only=True)
-        feat_k = self.netG_B(src, self.nce_layers, encode_only=True)
-        feat_k_pool, sample_ids = self.netF2(feat_k, self.opt.num_patches, None)
-        feat_q_pool, _ = self.netF1(feat_q, self.opt.num_patches, sample_ids)
-        total_nce_loss = 0.0
-        for f_q, f_k, crit, nce_layer in zip(feat_q_pool, feat_k_pool, self.criterionNCE, self.nce_layers):
-            loss = crit(f_q, f_k)
-            total_nce_loss += loss.mean()
-        return total_nce_loss / n_layers
 
     def generate_visuals_for_evaluation(self, data, mode):
         with torch.no_grad():

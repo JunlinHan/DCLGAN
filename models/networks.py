@@ -506,7 +506,7 @@ class MappingF(nn.Module):
         self.gpu_ids = gpu_ids
         avg = nn.AdaptiveAvgPool2d(1)
         conv = nn.Conv2d(in_layer, dim, 3, stride=2)
-        self.model = nn.Sequential(*[conv,nn.ReLU(),avg,nn.Flatten(),nn.Linear(dim,dim),nn.ReLU(),nn.Linear(dim,dim)])
+        self.model = nn.Sequential(*[conv, nn.ReLU(), avg, nn.Flatten(), nn.Linear(dim,dim), nn.ReLU(), nn.Linear(dim, dim)])
         init_net(self.model, self.init_type, self.init_gain, self.gpu_ids)
         self.l2norm = Normalize(2)
 

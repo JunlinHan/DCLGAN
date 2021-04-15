@@ -1,8 +1,15 @@
 from packaging import version
 import torch
 from torch import nn
-# Note this is different from the vanilla CUT. I use cosine similarity here, but both implementations are identical ( after the L2 normalization).
-# You may replace this with class PatchNCEloss2 ( used in vanilla CUT, no cosine similarity)
+
+"""
+Note this is different from the vanilla CUT. I use cosine similarity here,
+but both implementations are identical (after the L2 normalization).
+You may choose class PatchNCEloss2 (used in vanilla CUT, no cosine similarity), by replacing line 5 in ./dcl_model.py
+or ./simdcl_model.py with "from .patchnce import PatchNCELoss2".
+"""
+
+
 class PatchNCELoss(nn.Module):
     def __init__(self, opt):
         super().__init__()

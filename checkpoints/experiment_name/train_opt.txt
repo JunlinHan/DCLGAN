@@ -1,0 +1,76 @@
+----------------- Options ---------------
+               batch_size: 1                             
+                    beta1: 0.5                           
+                    beta2: 0.999                         
+          checkpoints_dir: ./checkpoints                 
+           continue_train: False                         
+                crop_size: 256                           
+                 dataroot: ./datasets/coral              	[default: placeholder]
+             dataset_mode: unaligned                     
+                direction: AtoB                          
+              display_env: main                          
+             display_freq: 400                           
+               display_id: None                          
+            display_ncols: 4                             
+             display_port: 8097                          
+           display_server: http://localhost              
+          display_winsize: 256                           
+               easy_label: experiment_name               
+                    epoch: latest                        
+              epoch_count: 1                             
+          evaluation_freq: 5000                          
+        flip_equivariance: True                          
+                 gan_mode: hinge                         
+                  gpu_ids: 0                             
+                init_gain: 0.02                          
+                init_type: xavier                        
+                 input_nc: 3                             
+                  isTrain: True                          	[default: None]
+               lambda_GAN: 1.0                           
+               lambda_IDT: 10.0                          
+               lambda_NCE: 10.0                          
+                load_size: 286                           
+                       lr: 0.0002                        
+           lr_decay_iters: 50                            
+                lr_policy: linear                        
+         max_dataset_size: inf                           
+                    model: fastcut                       	[default: dcl]
+                 n_epochs: 150                           
+           n_epochs_decay: 50                            
+               n_layers_D: 3                             
+                     name: experiment_name               
+                    nce_T: 0.07                          
+                  nce_idt: False                         
+nce_includes_all_negatives_from_minibatch: False                         
+               nce_layers: 0,4,8,12,16                   
+                      ndf: 64                            
+                     netD: basic                         
+                     netF: mlp_sample                    
+                  netF_nc: 256                           
+                     netG: resnet_9blocks                
+                      ngf: 64                            
+             no_antialias: False                         
+          no_antialias_up: False                         
+               no_dropout: True                          
+                  no_flip: False                         
+                  no_html: False                         
+                    normD: instance                      
+                    normG: instance                      
+              num_patches: 256                           
+              num_threads: 4                             
+                output_nc: 3                             
+                    phase: train                         
+                pool_size: 0                             
+               preprocess: resize_and_crop               
+          pretrained_name: None                          
+               print_freq: 100                           
+         random_scale_max: 3.0                           
+             save_by_iter: False                         
+          save_epoch_freq: 50                            
+         save_latest_freq: 5000                          
+           serial_batches: False                         
+stylegan2_G_num_downsampling: 1                             
+                   suffix:                               
+         update_html_freq: 1000                          
+                  verbose: False                         
+----------------- End -------------------
