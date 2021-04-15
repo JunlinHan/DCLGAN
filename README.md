@@ -18,11 +18,11 @@ Qualitative results:
 
 Quantitative results:
 
-<img src="imgs/results2.png" width="800px"/>
+<img src="imgs/table.png" width="800px"/>
 
 More visual results:
 
-<img src="imgs/results3.png" width="800px"/>
+<img src="imgs/results2.png" width="800px"/>
 
 ## Prerequisites
 Python 3.6 or above.
