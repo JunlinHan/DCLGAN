@@ -6,7 +6,7 @@ We provide our PyTorch implementation of DCLGAN, which is a simple yet powerful 
 
 DCLGAN is a general model performing all kinds of Image-to-Image translation tasks. It achieves SOTA performances in most tasks that we have tested.
 
-[Dual Contrastive Learning for Unsupervised Image-to-Image Translation]()<br>
+[Dual Contrastive Learning for Unsupervised Image-to-Image Translation](imgs/han_dualcontrastive.pdf)<br>
 [Junlin Han](https://junlinhan.github.io/), Mehrdad Shoeiby, Lars Petersson, Mohammad Ali Armin<br>
 DATA61-CSIRO and Australian National University<br>
 In NTIRE, CVPRW 2021.
