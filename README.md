@@ -4,7 +4,7 @@
 
 We provide our PyTorch implementation of DCLGAN, which is a simple yet powerful model for unsupervised Image-to-image translation. Compared to CycleGAN, DCLGAN performs geometry changes with more realistic results. Compared to CUT, DCLGAN is usually more robust and achieves better performance. A viriant, SimDCL (Similarity DCLGAN) also avoids mode collapse using a new similarity loss.
 
-DCLGAN is a general model performing all kinds of Image-to-Image translation tasks. It achieves SOTA performances in most tasks that we have tested.
+DCLGAN is a general model performing ***all kinds of Image-to-Image translation tasks***. It achieves ***SOTA*** performances in most tasks that we have tested.
 
 [Dual Contrastive Learning for Unsupervised Image-to-Image Translation](imgs/han_dualcontrastive.pdf)<br>
 [Junlin Han](https://junlinhan.github.io/), Mehrdad Shoeiby, Lars Petersson, Mohammad Ali Armin<br>
@@ -58,7 +58,7 @@ The dataset is downloaded and unzipped at `./datasets/grumpifycat/`.
 
 - To view training results and loss plots, run `python -m visdom.server` and click the URL http://localhost:8097.
 
-- Train the DCL model:
+Train the DCL model:
 ```bash
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_DCL 
 ```
@@ -81,14 +81,14 @@ and fastCUT:
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_fastcut --model fastcut
 ```
 
-The checkpoints will be stored at `./checkpoints/grumpycat_DCL/web`.
+The checkpoints will be stored at `./checkpoints/grumpycat_DCL/`.
 
 - Test the DCL model:
 ```bash
 python test.py --dataroot ./datasets/grumpifycat --name grumpycat_DCL
 ```
 
-The test results will be saved to an html file here: `./results/grumpifycat/latest_test/index.html`.
+The test results will be saved to an html file here: `./results/grumpycat_DCL/latest_test/`.
 
 ### DCLGAN, SimDCL, CUT and CycleGAN
 DCLGAN is a more robust unsupervised image-to-image translation model compared to previous models. Our performance is usually better than CUT & CycleGAN.
@@ -109,7 +109,8 @@ Horse <-> Zebra: https://drive.google.com/file/d/16oPsXaP3RgGargJS0JO1K-vWBz42n5
 
 CityScapes: https://drive.google.com/file/d/1ZiLAhYG647ipaVXyZdBCsGeiHgBmME6X/view?usp=sharing
 
-Download the pre-tained model, unzip it and put it inside ./checkpoints (You may need to create checkpoints folder by yourself if you didn't run the training code). 
+Download the pre-tained model, unzip it and put it inside ./checkpoints (You may need to create checkpoints folder by yourself if you didn't run the training code).
+
 Example usage: Download the dataset of Horse2Zebra and test the model using:
 
 ```bash
