@@ -1,6 +1,6 @@
+[arXiv](https://arxiv.org/abs/2104.07689)
 
-
-# Dual Contrastive Learning Adversarial Generative Networks(DCLGAN)
+# Dual Contrastive Learning Adversarial Generative Networks (DCLGAN)
 
 We provide our PyTorch implementation of DCLGAN, which is a simple yet powerful model for unsupervised Image-to-image translation. Compared to CycleGAN, DCLGAN performs geometry changes with more realistic results. Compared to CUT, DCLGAN is usually more robust and achieves better performance. A viriant, SimDCL (Similarity DCLGAN) also avoids mode collapse using a new similarity loss.
 
@@ -38,7 +38,7 @@ For packages, see requirements.txt.
 
 - Clone this repo:
 ```bash
-git clone
+git clone https://github.com/JunlinHan/DCLGAN.git
 ```
 
 - Install PyTorch 1.4 or above and other dependencies (e.g., torchvision, visdom, dominate, gputil).
@@ -95,6 +95,11 @@ DCLGAN is a more robust unsupervised image-to-image translation model compared t
 
 SIMDCL is a different version, it was designed to solve mode collpase. We recommend using it for small-scale, unbalanced dataset.
 
+### [Datasets](./docs/datasets.md)
+Download CUT/CycleGAN/pix2pix datasets and learn how to create your own datasets.
+
+Or download it here: https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/datasets/.
+
 ### Apply a pre-trained DCL model and evaluate
 We provide our pre-trained DCLGAN models for:
 
@@ -122,12 +127,6 @@ and Zorse-> Hebra:
 ```bash
 python -m pytorch_fid ./results/horse2zebra_dcl/test_latest/images/fake_A ./results/horse2zebra_dcl/test_latest/images/real_A
 ```
-
-
-### [Datasets](./docs/datasets.md)
-Download CUT/CycleGAN/pix2pix datasets and learn how to create your own datasets.
-
-Or download it here: https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/datasets/.
 
 ### Citation
 If you use our code or our results, please consider citing our paper. Thanks in advance!
