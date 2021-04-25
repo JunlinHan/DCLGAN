@@ -274,7 +274,7 @@ def define_F(input_nc, netF, norm='batch', use_dropout=False, init_type='normal'
     elif netF == 'reshape':
         net = ReshapeF()
     elif netF == 'mapping':
-        net = MappingF(input_nc)
+        net = MappingF(input_nc, gpu_ids=gpu_ids)
     elif netF == 'sample':
         net = PatchSampleF(use_mlp=False, init_type=init_type, init_gain=init_gain, gpu_ids=gpu_ids, nc=opt.netF_nc)
     elif netF == 'mlp_sample':
@@ -493,7 +493,7 @@ class ReshapeF(nn.Module):
         return self.l2norm(x_reshape)
 
 class MappingF(nn.Module):
-    def __init__(self, in_layer=4, nc=256, patch_num=256, dim=64, init_type='normal', init_gain=0.02, gpu_ids=[]):
+    def __init__(self, in_layer=4, gpu_ids=[], nc=256, patch_num=256, dim=64, init_type='normal', init_gain=0.02):
         # hard-coded code.
         super().__init__()
         self.init_type = init_type
