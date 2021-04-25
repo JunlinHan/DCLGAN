@@ -84,10 +84,18 @@ class SIMDCLModel(BaseModel):
                                        not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids,
                                        opt)
         n_layers = len(self.nce_layers)
-        self.netF3 = networks.define_F(n_layers, 'mapping')
-        self.netF4 = networks.define_F(n_layers, 'mapping')
-        self.netF5 = networks.define_F(n_layers, 'mapping')
-        self.netF6 = networks.define_F(n_layers, 'mapping')
+        self.netF3 = networks.define_F(n_layers, 'mapping', opt.normG,
+                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids,
+                                       opt)
+        self.netF4 = networks.define_F(n_layers, 'mapping', opt.normG,
+                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids,
+                                       opt)
+        self.netF5 = networks.define_F(n_layers, 'mapping', opt.normG,
+                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids,
+                                       opt)
+        self.netF6 = networks.define_F(n_layers, 'mapping', opt.normG,
+                                       not opt.no_dropout, opt.init_type, opt.init_gain, opt.no_antialias, self.gpu_ids,
+                                       opt)
         if self.isTrain:
             self.netD_A = networks.define_D(opt.output_nc, opt.ndf, opt.netD,
                                             opt.n_layers_D, opt.normD, opt.init_type, opt.init_gain, opt.no_antialias,
@@ -269,15 +277,14 @@ class SIMDCLModel(BaseModel):
             feature_fakeB[i] = feat_q_pool1_noid[i]
             feature_realB[i] = feat_k_pool2[i]
             feature_fakeA[i] = feat_q_pool2_noid[i]
-
-        feature_realA_out = self.netF3(feature_realA)
-        feature_fakeB_out = self.netF4(feature_fakeB)
-        feature_realB_out = self.netF5(feature_realB)
-        feature_fakeA_out = self.netF6(feature_fakeA)
+        feature_realA_out = self.netF3(feature_realA.to(self.device))
+        feature_fakeB_out = self.netF4(feature_fakeB.to(self.device))
+        feature_realB_out = self.netF5(feature_realB.to(self.device))
+        feature_fakeA_out = self.netF6(feature_fakeA.to(self.device))
         sim_loss = self.criterionSim(feature_realA_out, feature_fakeA_out) + \
                    self.criterionSim(feature_fakeB_out, feature_realB_out)
 
-        return sim_loss, nce_loss1, nce_loss2
+        return sim_loss * self.opt.lambda_SIM, nce_loss1, nce_loss2
 
     def generate_visuals_for_evaluation(self, data, mode):
         with torch.no_grad():
