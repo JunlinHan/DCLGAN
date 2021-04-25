@@ -81,6 +81,12 @@ and fastCUT:
 python train.py --dataroot ./datasets/grumpifycat --name grumpycat_fastcut --model fastcut
 ```
 
+and CycleGAN:
+
+```bash
+python train.py --dataroot ./datasets/grumpifycat --name grumpycat_cyclegan --model cycle_gan
+```
+
 The checkpoints will be stored at `./checkpoints/grumpycat_DCL/`.
 
 - Test the DCL model:
