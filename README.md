@@ -41,7 +41,7 @@ For packages, see requirements.txt.
 git clone https://github.com/JunlinHan/DCLGAN.git
 ```
 
-- Install PyTorch 1.4 or above and other dependencies (e.g., torchvision, visdom, dominate, gputil).
+- Install PyTorch 1.6 or above and other dependencies (e.g., torchvision, visdom, dominate, gputil).
 
   For pip users, please type the command `pip install -r requirements.txt`.
 
