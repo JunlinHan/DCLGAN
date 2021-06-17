@@ -1,4 +1,4 @@
-[arXiv](https://arxiv.org/abs/2104.07689)|[Video](https://youtu.be/w0oltXvLgmI)|[Slide](imgs/DCLGAN_slide.pptx)
+[arXiv](https://arxiv.org/abs/2104.07689)  |  [Video](https://youtu.be/w0oltXvLgmI)  |  [Slide](imgs/DCLGAN_slide.pptx)
 
 # Dual Contrastive Learning Adversarial Generative Networks (DCLGAN)
 
