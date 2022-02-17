@@ -106,6 +106,8 @@ Download CUT/CycleGAN/pix2pix datasets and learn how to create your own datasets
 
 Or download it here: https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/datasets/.
 
+When you prepare the CityScape dataset, please use Pillow=5.0.0 to run prepare_dataset.py. (See [issue 7](https://github.com/JunlinHan/DCLGAN/issues/7) for details).
+
 ### Apply a pre-trained DCL model and evaluate
 We provide our pre-trained DCLGAN models for:
 
