@@ -158,7 +158,7 @@ If you use something included in CUT, you may also [CUT](https://arxiv.org/pdf/2
 ```
 
 ### Contact
-junlin.han@data61.csiro.au or junlinhcv@gmail.com
+junlinhcv@gmail.com
 
 ### Acknowledgments
 Our code is developed based on [pytorch-CycleGAN-and-pix2pix](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix) and [CUT](http://taesung.me/ContrastiveUnpairedTranslation/). We thank the awesome work provided by CycleGAN and CUT.
