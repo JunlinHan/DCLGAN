@@ -3,7 +3,7 @@ Download the CUT and CycleGAN datasets using the following script. Some of the d
 ```bash
 bash ./datasets/download_cut_dataset.sh dataset_name
 ```
-- `grumpifycat`: 88 Russian Blue cats from The Oxford-IIIT Pet [Dataset](http://www.robots.ox.ac.uk/~vgg/data/pets/) and 214 Grumpy cats. We use an OpenCV detector `./datasets/detect_cat_face.py` to detect cat faces. Also check this [Dataset]([http://www.robots.ox.ac.uk/~vgg/data/pets/](https://efrosgans.eecs.berkeley.edu/cyclegan/datasets/grumpifycat.zip.)) if any links are not working.
+- `grumpifycat`: 88 Russian Blue cats from The Oxford-IIIT Pet [Dataset](http://www.robots.ox.ac.uk/~vgg/data/pets/) and 214 Grumpy cats. We use an OpenCV detector `./datasets/detect_cat_face.py` to detect cat faces. Also check this [Dataset](https://efrosgans.eecs.berkeley.edu/cyclegan/datasets/grumpifycat.zip) if any links are not working.
 - `facades`: 400 images from the [CMP Facades dataset](http://cmp.felk.cvut.cz/~tylecr1/facade). [[Citation](../datasets/bibtex/facades.tex)]
 - `cityscapes`: 2975 images from the [Cityscapes training set](https://www.cityscapes-dataset.com). [[Citation](../datasets/bibtex/cityscapes.tex)]. Note: Due to license issue, we cannot directly provide the Cityscapes dataset. Please download the Cityscapes dataset from [https://cityscapes-dataset.com](https://cityscapes-dataset.com)  and use the script `./datasets/prepare_cityscapes_dataset.py`.
 
