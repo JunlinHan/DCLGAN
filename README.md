@@ -109,6 +109,9 @@ Or download it here: https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/dat
 When preparing the CityScape dataset, please use Pillow=5.0.0 to run prepare_dataset.py for consistency. 
 
 ### Apply a pre-trained DCL model and evaluate
+
+[Aug 2026] It looks like the download links for the pre-trained models are no longer working. If you happen to have a copy, please contact me at junlinhcv@gmail.com so I can re-upload them. Thank you very much!
+
 We provide our pre-trained DCLGAN models for:
 
 Cat <-> Dog : https://drive.google.com/file/d/1-0SICLeoySDG0q2k1yeJEI2QJvEL-DRG/view?usp=sharing
